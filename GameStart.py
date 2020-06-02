@@ -1,5 +1,6 @@
 import pyxel
 
+
 class Node:
     def __init__(self, value, x, y):
         self.left = None
@@ -40,6 +41,9 @@ class App:
         pyxel.mouse(True)
         pyxel.load("assets/sound.pyxres")
         self.nodes = []
+        self.pre_order = False
+        self.in_order = False
+        self.post_order = False
 
         # tree
         n1 = Node(35, 128, 30)
@@ -55,6 +59,18 @@ class App:
         n11 = Node(50, 186, 135)
         n12 = Node(59, 246, 135)
 
+        n1.set_left(n2)
+        n1.set_right(n3)
+        n2.set_left(n4)
+        n2.set_right(n5)
+        n3.set_left(n6)
+        n3.set_right(n7)
+        n4.set_left(n8)
+        n4.set_right(n9)
+        n6.set_left(n10)
+        n7.set_left(n11)
+        n7.set_right(n12)
+
         self.nodes.append(n1)
         self.nodes.append(n2)
         self.nodes.append(n3)
@@ -68,33 +84,68 @@ class App:
         self.nodes.append(n11)
         self.nodes.append(n12)
 
-
-
         pyxel.run(self.update, self.draw)
 
     def update(self):
         if(pyxel.btnp(pyxel.KEY_ENTER)):
             pyxel.play(0, 0)
         if (pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON)):
-            pyxel.play(0, 1)
+            x = pyxel.mouse_x
+            y = pyxel.mouse_y
+            if x < 85 and y < 15:
+                self.pre_order = True
+                self.post_order = False
+                self.in_order = False
+            elif 85 < x < 170 and y < 15:
+                self.in_order = True
+                self.post_order = False
+                self.pre_order = False
+            elif 170 < x and y < 15:
+                self.post_order = True
+                self.pre_order = False
+                self.in_order = False
+            # pyxel.play(0, 1)
+
 
     def draw(self):
         pyxel.cls(7)
 
         # Menu to pick an order
-        pyxel.rectb(0, 0, 85, 15, 8)
-        pyxel.rectb(85, 0, 85, 15, 8)
-        pyxel.rectb(170, 0, 85, 15, 8)
-        pyxel.text(20, 5, "Pre-order", 8)
-        pyxel.text(110, 5, "In-order", 8)
-        pyxel.text(190, 5, "Post-order", 8)
+        if self.pre_order == True:
+            pyxel.rect(0, 0, 85, 15, 9)
+            pyxel.text(20, 5, "Pre-order", 7)
+        else:
+            pyxel.rectb(0, 0, 85, 15, 8)
+            pyxel.text(20, 5, "Pre-order", 8)
+
+        if self.in_order == True:
+            pyxel.rect(85, 0, 85, 15, 9)
+            pyxel.text(110, 5, "In-order", 7)
+        else:
+            pyxel.rectb(85, 0, 85, 15, 8)
+            pyxel.text(110, 5, "In-order", 8)
+
+        if self.post_order == True:
+            pyxel.rect(170, 0, 85, 15, 9)
+            pyxel.text(190, 5, "Post-order", 7)
+        else:
+            pyxel.rectb(170, 0, 85, 15, 8)
+            pyxel.text(190, 5, "Post-order", 8)
 
         # Line at the bottom so I can print the text inside
         pyxel.line(0, 160, 256, 160, 8)
 
         for node in self.nodes:
-            pyxel.circb(node.get_x(), node.get_y(), node.get_radius(), 8)
-            pyxel.text(node.get_x()-3, node.get_y()-2, str(node.get_value()), 8)
+            if node.get_left() is not None:
+                left_child = node.get_left()
+                pyxel.line(node.get_x(), node.get_y(), left_child.get_x(), left_child.get_y(), 8)
+
+            if node.get_right() is not None:
+                right_child = node.get_right()
+                pyxel.line(node.get_x(), node.get_y(), right_child.get_x(), right_child.get_y(), 8)
+
+            pyxel.circ(node.get_x(), node.get_y(), node.get_radius(), 8)
+            pyxel.text(node.get_x() - 3, node.get_y() - 2, str(node.get_value()), 7)
 
 
 App()
