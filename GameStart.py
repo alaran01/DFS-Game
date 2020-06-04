@@ -106,48 +106,66 @@ class App:
     def update(self):
         if(pyxel.btnp(pyxel.KEY_ENTER)):
             pyxel.play(0, 0)
-        if (pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON)):
+
+        if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
             x = pyxel.mouse_x
             y = pyxel.mouse_y
+
+            # clicked pre-order button
             if x < 85 and y < 15:
                 self.pre_order = True
                 self.post_order = False
                 self.in_order = False
+
+                for node in self.nodes:
+                    node.set_selected(False)
+
+            # clicked in-order button
             elif 85 < x < 170 and y < 15:
                 self.in_order = True
                 self.post_order = False
                 self.pre_order = False
+
+                for node in self.nodes:
+                    node.set_selected(False)
+
+            # clicked post-order button
             elif 170 < x and y < 15:
                 self.post_order = True
                 self.pre_order = False
                 self.in_order = False
 
+                for node in self.nodes:
+                    node.set_selected(False)
+
+            # check if clicked on a node
             for node in self.nodes:
                 if node.inside(x, y):
                     node.set_selected(True)
-            # pyxel.play(0, 1)
+
 
     def draw(self):
         pyxel.cls(7)
 
         # Menu to pick an order
-        if self.pre_order == True:
+        if self.pre_order:
             pyxel.rect(0, 0, 85, 15, 8)
             pyxel.text(20, 5, "Pre-order", 7)
         else:
             pyxel.rectb(0, 0, 85, 15, 8)
             pyxel.text(20, 5, "Pre-order", 8)
 
-        if self.in_order == True:
+        if self.in_order:
             pyxel.rect(85, 0, 85, 15, 8)
             pyxel.text(110, 5, "In-order", 7)
         else:
             pyxel.rectb(85, 0, 85, 15, 8)
             pyxel.text(110, 5, "In-order", 8)
 
-        if self.post_order == True:
+        if self.post_order:
             pyxel.rect(170, 0, 85, 15, 8)
             pyxel.text(190, 5, "Post-order", 7)
+
         else:
             pyxel.rectb(170, 0, 85, 15, 8)
             pyxel.text(190, 5, "Post-order", 8)
