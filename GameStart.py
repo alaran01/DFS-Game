@@ -117,6 +117,7 @@ class App:
             # clicked pre-order button
             if x < 85 and y < 15:
                 self.list_of_orders.clear()
+                self.index_to_check = 0
                 self.mode_pre_order = True
                 self.mode_post_order = False
                 self.mode_in_order = False
@@ -128,6 +129,7 @@ class App:
             # clicked in-order button
             elif 85 < x < 170 and y < 15:
                 self.list_of_orders.clear()
+                self.index_to_check = 0
                 self.mode_in_order = True
                 self.mode_post_order = False
                 self.mode_pre_order = False
@@ -139,6 +141,7 @@ class App:
             # clicked post-order button
             elif 170 < x and y < 15:
                 self.list_of_orders.clear()
+                self.index_to_check = 0
                 self.mode_post_order = True
                 self.mode_pre_order = False
                 self.mode_in_order = False
@@ -149,7 +152,7 @@ class App:
 
             # check if clicked on a node
             for node in self.nodes:
-                if node.inside(x, y):
+                if node.inside(x, y) and len(self.list_of_orders) != 0:
                     if node == self.list_of_orders[self.index_to_check]:
                         node.set_selected(True)
                         self.index_to_check += 1
