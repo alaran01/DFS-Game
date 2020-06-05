@@ -58,12 +58,15 @@ class App:
         pyxel.mouse(True)
         pyxel.load("assets/sound.pyxres")
         self.nodes = []
-        self.pre_order = False
-        self.in_order = False
-        self.post_order = False
+        self.mode_pre_order = False
+        self.mode_in_order = False
+        self.mode_post_order = False
+        self.list_of_orders = []
+        self.index_to_check = 0
 
         # tree
         n1 = Node(35, 128, 30)
+        self.root = n1
         n2 = Node(15, 70, 65)
         n3 = Node(45, 186, 65)
         n4 = Node(13, 35, 100)
@@ -104,7 +107,7 @@ class App:
         pyxel.run(self.update, self.draw)
 
     def update(self):
-        if(pyxel.btnp(pyxel.KEY_ENTER)):
+        if (pyxel.btnp(pyxel.KEY_ENTER)):
             pyxel.play(0, 0)
 
         if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
@@ -113,27 +116,33 @@ class App:
 
             # clicked pre-order button
             if x < 85 and y < 15:
-                self.pre_order = True
-                self.post_order = False
-                self.in_order = False
+                self.list_of_orders.clear()
+                self.mode_pre_order = True
+                self.mode_post_order = False
+                self.mode_in_order = False
+                self.pre_order(self.root)
 
                 for node in self.nodes:
                     node.set_selected(False)
 
             # clicked in-order button
             elif 85 < x < 170 and y < 15:
-                self.in_order = True
-                self.post_order = False
-                self.pre_order = False
+                self.list_of_orders.clear()
+                self.mode_in_order = True
+                self.mode_post_order = False
+                self.mode_pre_order = False
+                self.in_order(self.root)
 
                 for node in self.nodes:
                     node.set_selected(False)
 
             # clicked post-order button
             elif 170 < x and y < 15:
-                self.post_order = True
-                self.pre_order = False
-                self.in_order = False
+                self.list_of_orders.clear()
+                self.mode_post_order = True
+                self.mode_pre_order = False
+                self.mode_in_order = False
+                self.post_order(self.root)
 
                 for node in self.nodes:
                     node.set_selected(False)
@@ -141,28 +150,32 @@ class App:
             # check if clicked on a node
             for node in self.nodes:
                 if node.inside(x, y):
-                    node.set_selected(True)
+                    if node == self.list_of_orders[self.index_to_check]:
+                        node.set_selected(True)
+                        self.index_to_check += 1
 
+                    else:
+                        print("Expecting" + str(self.list_of_orders[self.index_to_check].get_value()))
 
     def draw(self):
         pyxel.cls(7)
 
         # Menu to pick an order
-        if self.pre_order:
+        if self.mode_pre_order:
             pyxel.rect(0, 0, 85, 15, 8)
             pyxel.text(20, 5, "Pre-order", 7)
         else:
             pyxel.rectb(0, 0, 85, 15, 8)
             pyxel.text(20, 5, "Pre-order", 8)
 
-        if self.in_order:
+        if self.mode_in_order:
             pyxel.rect(85, 0, 85, 15, 8)
             pyxel.text(110, 5, "In-order", 7)
         else:
             pyxel.rectb(85, 0, 85, 15, 8)
             pyxel.text(110, 5, "In-order", 8)
 
-        if self.post_order:
+        if self.mode_post_order:
             pyxel.rect(170, 0, 85, 15, 8)
             pyxel.text(190, 5, "Post-order", 7)
 
@@ -191,5 +204,24 @@ class App:
                 pyxel.circb(node.get_x(), node.get_y(), node.get_radius(), 8)
                 pyxel.text(node.get_x() - 3, node.get_y() - 2, str(node.get_value()), 8)
 
+    def pre_order(self, node):
+        if node is not None:
+            self.list_of_orders.append(node)
+            self.pre_order(node.get_left())
+            self.pre_order(node.get_right())
+
+    def post_order(self, node):
+        if node is not None:
+            self.post_order(node.get_left())
+            self.post_order(node.get_right())
+            self.list_of_orders.append(node)
+
+    def in_order(self, node):
+        if node is not None:
+            self.in_order(node.get_left())
+            self.list_of_orders.append(node)
+            self.in_order(node.get_right())
+
 
 App()
+
