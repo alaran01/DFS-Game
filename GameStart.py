@@ -56,13 +56,15 @@ class App:
     def __init__(self):
         pyxel.init(256, 180)
         pyxel.mouse(True)
-        pyxel.load("assets/sound.pyxres")
+        pyxel.load("assets/sound_and_images.pyxres")
+        pyxel.image(1).load(0, 0, "assets/game_over.png")
         self.nodes = []
         self.mode_pre_order = False
         self.mode_in_order = False
         self.mode_post_order = False
         self.list_of_orders = []
         self.index_to_check = 0
+        self.num_of_lives = 3
 
         # tree
         n1 = Node(35, 128, 30)
@@ -107,9 +109,6 @@ class App:
         pyxel.run(self.update, self.draw)
 
     def update(self):
-        if (pyxel.btnp(pyxel.KEY_ENTER)):
-            pyxel.play(0, 0)
-
         if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
             x = pyxel.mouse_x
             y = pyxel.mouse_y
@@ -123,7 +122,6 @@ class App:
                 self.mode_in_order = False
                 self.pre_order(self.root)
                 pyxel.play(0, 3)
-
 
                 for node in self.nodes:
                     node.set_selected(False)
@@ -164,6 +162,7 @@ class App:
 
                     else:
                         pyxel.play(0, 0)
+                        self.num_of_lives -= 1
 
     def draw(self):
         pyxel.cls(7)
@@ -219,6 +218,30 @@ class App:
             if n.get_selected():
                 pyxel.text(x, y, str(n.get_value()), 8)
                 x += 15
+        if self.index_to_check == len(self.list_of_orders) and len(self.list_of_orders) != 0:
+            pyxel.text(x, y, "Well done! ", 8)
+
+        # print instructions
+        if self.mode_in_order or self.mode_post_order or self.mode_pre_order:
+            if self.index_to_check == len(self.list_of_orders):
+                pyxel.text(5, 20, "Finished !!", 8)
+                pyxel.text(5, 30, "you won ! ", 8)
+            else:
+                pyxel.text(5, 20, "Click on the nodes", 8)
+                pyxel.text(5, 30, "in the correct order ", 8)
+        else:
+            pyxel.text(5, 20, "Select one of ", 8)
+            pyxel.text(5, 30, "the above options", 8)
+
+        # drawing hearts for lives
+        if self.num_of_lives == 0:
+            # pyxel.text(190, 30, "Game Over! ", 8)
+            pyxel.blt(100, 50, 1, 0, 0, 100, 53)
+        else:
+            pyxel.text(190, 20, "Lives remaining: ", 8)
+            for i in range(self.num_of_lives):
+                pyxel.blt(200 + i * 18, 30, 0, 0, 0, 20, 20, 0)
+
 
     def pre_order(self, node):
         if node is not None:
