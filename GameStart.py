@@ -122,6 +122,8 @@ class App:
                 self.mode_post_order = False
                 self.mode_in_order = False
                 self.pre_order(self.root)
+                pyxel.play(0, 3)
+
 
                 for node in self.nodes:
                     node.set_selected(False)
@@ -134,6 +136,7 @@ class App:
                 self.mode_post_order = False
                 self.mode_pre_order = False
                 self.in_order(self.root)
+                pyxel.play(0, 3)
 
                 for node in self.nodes:
                     node.set_selected(False)
@@ -146,19 +149,21 @@ class App:
                 self.mode_pre_order = False
                 self.mode_in_order = False
                 self.post_order(self.root)
+                pyxel.play(0, 3)
 
                 for node in self.nodes:
                     node.set_selected(False)
 
             # check if clicked on a node
             for node in self.nodes:
-                if node.inside(x, y) and len(self.list_of_orders) != 0:
+                if node.inside(x, y) and len(self.list_of_orders) != 0 and self.index_to_check < len(self.list_of_orders):
                     if node == self.list_of_orders[self.index_to_check]:
                         node.set_selected(True)
                         self.index_to_check += 1
+                        pyxel.play(0, 4)
 
                     else:
-                        print("Expecting" + str(self.list_of_orders[self.index_to_check].get_value()))
+                        pyxel.play(0, 0)
 
     def draw(self):
         pyxel.cls(7)
@@ -181,14 +186,11 @@ class App:
         if self.mode_post_order:
             pyxel.rect(170, 0, 85, 15, 8)
             pyxel.text(190, 5, "Post-order", 7)
-
         else:
             pyxel.rectb(170, 0, 85, 15, 8)
             pyxel.text(190, 5, "Post-order", 8)
 
-        # Line at the bottom so I can print the text inside
-        pyxel.line(0, 160, 256, 160, 8)
-
+        # drawing the nodes
         for node in self.nodes:
             if node.get_left() is not None:
                 left_child = node.get_left()
@@ -206,6 +208,17 @@ class App:
                 pyxel.circ(node.get_x(), node.get_y(), node.get_radius(), 7)
                 pyxel.circb(node.get_x(), node.get_y(), node.get_radius(), 8)
                 pyxel.text(node.get_x() - 3, node.get_y() - 2, str(node.get_value()), 8)
+
+        # Line at the bottom so I can print the text inside
+        pyxel.line(0, 160, 256, 160, 8)
+
+        #  print the node value at the bottom when it is correct
+        x = 5
+        y = 168
+        for n in self.list_of_orders:
+            if n.get_selected():
+                pyxel.text(x, y, str(n.get_value()), 8)
+                x += 15
 
     def pre_order(self, node):
         if node is not None:
